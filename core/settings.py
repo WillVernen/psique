@@ -158,6 +158,9 @@ MESSAGE_TAGS = {
 # OpenAI API
 OPENAI_API_KEY = config('OPENAI_API_KEY')
 
+# Em redes com proxy/antivírus que quebram o SSL do Python, use SSL_VERIFY=False no .env (só em dev).
+SSL_VERIFY = config('SSL_VERIFY', cast=bool, default=True)
+
 # Evolution API (WhatsApp)
 EVOLUTION_API_URL = config('EVOLUTION_API_URL', default='')
 EVOLUTION_API_KEY = config('EVOLUTION_API_KEY', default='')
@@ -167,8 +170,8 @@ EVOLUTION_INSTANCE_NAME = config('EVOLUTION_INSTANCE_NAME', default='')
 Q_CLUSTER = {
     "name": "pythonando",
     "workers": 1,
-    "retry": 200,        
-    "timeout": 180,       
+    "retry": 600,
+    "timeout": 480,  # Whisper + resumo podem demorar em vídeos longos
     "queue_limit": 50,
     "orm": "default",
 }

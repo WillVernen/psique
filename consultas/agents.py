@@ -2,23 +2,23 @@ from langchain_core.prompts import ChatPromptTemplate
 from abc import abstractmethod
 from prompts.prompts import SUMMARY_PROMPT, PSI_PROMPT, EVALUATION_PROMPT
 from pydantic import BaseModel, Field
-from langchain_openai import ChatOpenAI
-from django.conf import settings
-from langchain_openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 import os
 import re
 import textwrap
 from .models import Pergunta, DataTreinamento
+from .openai_client import get_chat_llm, get_embeddings
 
 class Summaries(BaseModel):
     summaries: list[str] = Field(description='Lista de resumos')
 
 class BaseAgent:
-    llm = ChatOpenAI(model_name='gpt-4.1-mini', openai_api_key=settings.OPENAI_API_KEY)
     language: str = 'pt-br'
     audience: str = 'Psícólogo e paciente'
+
+    def __init__(self):
+        self.llm = get_chat_llm(model_name='gpt-4.1-mini')
 
     @abstractmethod
     def _prompt(self): ...
@@ -66,22 +66,24 @@ class RAGContext:
         self.db_path = db_path
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.embeddings = OpenAIEmbeddings(openai_api_key=settings.OPENAI_API_KEY)
+        self.embeddings = get_embeddings()
         
         self.splitter = RecursiveCharacterTextSplitter(
             chunk_size=self.chunk_size,
             chunk_overlap=self.chunk_overlap
         )
 
-        self.chat = ChatOpenAI(
+        self.chat = get_chat_llm(
             model_name="gpt-4.1-mini",
             temperature=0.7,
-            openai_api_key=settings.OPENAI_API_KEY,
-            
         )
 
     def train(self, docs, paciente_id):
+        docs = [d for d in docs if (d.page_content or '').strip()]
         chunks = self.splitter.split_documents(docs)
+        if not chunks:
+            raise ValueError('Nenhum texto para indexar no FAISS (documentos/chunks vazios).')
+
         db_path = f'{self.db_path}_{paciente_id}'
         if os.path.exists(db_path):
             vectordb = FAISS.load_local(db_path,  self.embeddings, allow_dangerous_deserialization=True)
