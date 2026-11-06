@@ -175,6 +175,7 @@ Q_CLUSTER = {
 
 # Authentication
 LOGIN_URL = '/usuarios/login/'
+LOGIN_REDIRECT_URL = '/usuarios/pacientes/'
 
 # Security settings for production
 if not DEBUG:

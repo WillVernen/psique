@@ -12,10 +12,25 @@ App de apoio ao trabalho clínico em psicologia: pacientes, gravações de sess�
 - LangChain + OpenAI
 - FAISS (RAG)
 - Docker / Gunicorn
+- Evolution API (WhatsApp, opcional)
 
-## Status
+## Como rodar
 
-Protótipo em evolução. Código histórico também em [`base_psique_arcane2`](https://github.com/WillVernen/base_psique_arcane2).
+```bash
+python -m venv venv
+# Windows
+venv\Scripts\activate
+pip install -r requirements.txt
+copy .env.example .env   # preencha SECRET_KEY, OPENAI_API_KEY, etc.
+python manage.py migrate
+python manage.py runserver
+```
+
+Em produção (Docker), o `entrypoint.prod.sh` executa migrate, collectstatic, qcluster e gunicorn.
+
+## Estrutura
+
+Código-fonte único na raiz do repositório (`core/`, `usuarios/`, `consultas/`, …).
 
 ## Licença
 

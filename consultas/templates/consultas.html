@@ -7,14 +7,13 @@
                 <a href="{% url 'pacientes' %}"><img src="{% static 'logo.png' %}" alt="PsiQuê" class="h-12 w-auto" /></a>
             </div>
             <nav class="hidden md:flex md:gap-x-11 md:text-sm/6 md:font-semibold md:text-gray-700">
-                <a href="#">Consultas</a>
-                <a href="#">Usuários</a>
+                <a href="{% url 'pacientes' %}">Pacientes</a>
             </nav>
             <div class="flex flex-1 items-center justify-end gap-x-8">
-                <span class="text-sm text-gray-600">{{ request.user.username }}</span>
-                <a href="{% url 'logout' %}" class="rounded-md bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-100">
-                    Sair
-                </a>
+                {% if humor_medio %}
+                    <span class="text-sm text-gray-600">Humor médio: <strong>{{ humor_medio }}</strong>/5</span>
+                {% endif %}
+                <a href="{% url 'logout' %}" class="text-sm font-semibold text-gray-700 hover:text-gray-900">Sair</a>
             </div>
         </div>
     </header>
